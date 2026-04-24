@@ -1,0 +1,23 @@
+## .NET / Visual Studio
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.db
+*.db-shm
+*.db-wal
+
+## Migrations — keep these committed
+# Migrations/
+
+## Environment / secrets
+appsettings.Production.json
+.env
+
+## OS
+.DS_Store
+Thumbs.db
+
+## Node client
+client/node_modules/

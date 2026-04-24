@@ -1,0 +1,42 @@
+name: Build and Deploy to Azure
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1. Checkout source ────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 2. Set up .NET 9 SDK ──────────────────────────────────────────────
+      - name: Set up .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+
+      # ── 3. Restore dependencies ───────────────────────────────────────────
+      - name: Restore NuGet packages
+        run: dotnet restore VehicleTrackAPI/VehicleTrackAPI.csproj
+
+      # ── 4. Build ──────────────────────────────────────────────────────────
+      - name: Build
+        run: dotnet build VehicleTrackAPI/VehicleTrackAPI.csproj --configuration Release --no-restore
+
+      # ── 5. Publish ────────────────────────────────────────────────────────
+      - name: Publish
+        run: dotnet publish VehicleTrackAPI/VehicleTrackAPI.csproj --configuration Release --output ./publish --no-build
+
+      # ── 6. Deploy to Azure App Service ───────────────────────────────────
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ secrets.AZURE_APP_NAME }}
+          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
+          package: ./publish
